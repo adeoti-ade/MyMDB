@@ -1,21 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}
+    All the movies
+{% endblock %}
+
+{% block main %}
     <ul>
         {% for movie in object_list %}
-            <li> {{ movie }} </li>
+            <li> 
+                <a href="{% url 'core:MovieDetail' pk=movie.id %}">
+                    {{ movie }}
+                </a> 
+            </li>
         {% empty %}
             <li> No movies yet </li>
         {% endfor %}
-    </ul>
-    <p>
-        Using https?
-        {{request.is_secure|yesno }}
-    </p>
-</body>
-</html>
+    </ul> 
+    {% if is_paginated %}
+        <ul class="paginated">
+            <li class="page-item">
+                <a href="{% url 'core:MovieList' %}?page=1" class="page-link">
+                    First
+                </a>
+            </li>
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a href="{% url 'core:MovieList' %}?page={{ page_obj.previous_page_number }}" class="page-link">
+                        {{ page_obj.previous_page_number }}
+                    </a>
+                </li>
+            {% endif %}
+            <li class="page-item active">
+                <a href="{% url 'core:MovieList' %}?page={{ page_obj.number }}" class="page_link">
+                    {{ page_obj.number }}
+                </a>
+            </li>
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a href="{% url 'core:MovieList' %}?page={{ page_obj.next_page_number }}" class="page_link">
+                        {{ page_obj.next_page_number }}
+                    </a>
+                </li>
+            {% endif %}
+            <li class="page-item">
+                <a href="{% url 'core:MovieList' %}?page=last" class="page-link">
+                    last
+                </a>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}
