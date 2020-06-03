@@ -1,4 +1,6 @@
 from django.db import models
+from django.conf import settings
+
 
 class MovieManager(models.Manager):
     def all_with_related_persons(self):
@@ -101,3 +103,29 @@ class Role(models.Model):
         unique_together = ('movie',
                             'person',
                             'name')
+
+class VoteManager(models.Manager):
+
+    def get_vote_or_unsaved_blank_vote(self, movie, user):
+        try:
+            return Vote.objects.get(movie, user)
+        except Vote.DoesNotExist:
+            return Vote(movie, user)
+
+class Vote(models.Model):
+
+    UP = 1
+    DOWN = -1
+    VALUE_CHOICES = (
+            (UP, "For"),
+            (DOWN, "Against")
+        )
+    value = models.SmallIntegerField(choices=VALUE_CHOICES)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    voted_on = models.DateTimeField(auto_now=True)
+
+    objects = VoteManager()
+
+    class Meta:
+        unique_together = ('user', 'movie')
