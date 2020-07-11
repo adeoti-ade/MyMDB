@@ -7,7 +7,6 @@ from core.forms import VoteForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 class MovieList(ListView):
-
     model = Movie
 
 class MovieDetail(DetailView):

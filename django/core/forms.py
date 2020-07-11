@@ -2,7 +2,7 @@ from django import forms
 from core.models import Movie, Vote
 from django.contrib.auth import get_user_model
 
-class VoteForm(form.ModelForm):
+class VoteForm(forms.ModelForm):
 
     user = forms.ModelChoiceField(
                             widget=forms.HiddenInput,
@@ -18,6 +18,5 @@ class VoteForm(form.ModelForm):
                             choices=Vote.VALUE_CHOICES)
     
     class Meta:
-
         model = Vote
         fields = ('user', 'movie', 'value')
