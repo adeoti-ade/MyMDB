@@ -10,13 +10,13 @@ class MovieList(ListView):
     model = Movie
 
 class MovieDetail(DetailView):
-    model = Movie
+    # model = Movie
     queryset = (Movie.objects.all_with_related_persons())
 
     def get_context_data(self, **kwargs):
-        ctx = super.get_context_data(**kwargs)
+        ctx = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated:
-            vote = Vote.objects.get_vote_or_blank_unsaved_vote(
+            vote = Vote.objects.get_vote_or_unsaved_blank_vote(
                                             movie=self.movie, 
                                             user=self.user)
             if vote.id:
@@ -36,7 +36,6 @@ class MovieDetail(DetailView):
         
         return ctx
 class PersonDetail(DetailView):
-
     queryset = Person.objects.all_with_prefetch_movies()
 
 class CreateVote(LoginRequiredMixin, CreateView):
@@ -54,7 +53,7 @@ class CreateVote(LoginRequiredMixin, CreateView):
         movie_id = self.object.movie.id
 
         return reverse(
-                    'core:MovieDetail',
+                    'core:movie_detail',
                     kwargs={
                         'pk': movie_id})
     
@@ -62,7 +61,7 @@ class CreateVote(LoginRequiredMixin, CreateView):
         movie_id = context['object'].id
 
         movie_detail_url = reverse(
-                    'core:MovieDetail',
+                    'core:movie_detail',
                     kwargs={
                         'pk': movie_id})
         return redirect(to=movie_detail_url)
