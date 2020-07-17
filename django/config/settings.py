@@ -131,4 +131,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-LOGIN_REDIRECT_URL = 'core:movie_detail'
+LOGIN_REDIRECT_URL = 'core:movie_list'
