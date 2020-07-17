@@ -1,11 +1,12 @@
 from django.urls import path
 
-from .views import MovieList, MovieDetail
-
+from . import views
 app_name = 'core'
 
 urlpatterns = [
-    path("movies/", MovieList.as_view(), name="movie_list"),
-    path("movie/<int:pk>/", MovieDetail.as_view(), name="movie_detail")
+    path("movies/", views.MovieList.as_view(), name="movie_list"),
+    path("movie/<int:pk>/", views.MovieDetail.as_view(), name="movie_detail"),
+    path("movie/<int:movie_id>/vote/", views.CreateVote.as_view(), name="create_vote"),
+    path("movie/<int:movie_id>/vote/<int:pk>/", views.UpdateVote.as_view(), name="update_vote"),
 ]
 

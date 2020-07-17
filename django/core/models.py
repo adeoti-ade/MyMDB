@@ -1,5 +1,9 @@
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.aggregates import Sum
+
+from uuid import uuid4
 
 
 class MovieManager(models.Manager):
@@ -9,6 +13,13 @@ class MovieManager(models.Manager):
         qs = qs.prefetch_related('writers', 'actors')
 
         return qs
+
+    def all_with_related_persons_and_score(self):
+        qs = self.all_with_related_persons()
+        qs = qs.annotate(score=Sum("vote__value"))
+        return qs
+        
+    
 
 class Movie(models.Model):
     NOT_RATED = 0
@@ -95,7 +106,7 @@ class Role(models.Model):
 
     def __str__(self):
 
-        return "{} {} {}".format(self.movie_id, self.person_id, self.name)
+        return "{} {} {}".format(self.movie, self.person, self.name)
 
     class Meta:
 
@@ -104,21 +115,19 @@ class Role(models.Model):
                             'name')
 
 class VoteManager(models.Manager):
-
     def get_vote_or_unsaved_blank_vote(self, movie, user):
         try:
-            return Vote.objects.get(movie, user)
-        except Vote.DoesNotExist:
-            return Vote(movie, user)
+            return Vote.objects.get(movie=movie, user=user)
+        except ObjectDoesNotExist:
+            return Vote(movie=movie, user=user)
 
 class Vote(models.Model):
 
     UP = 1
     DOWN = -1
     VALUE_CHOICES = (
-            (UP, "For"),
-            (DOWN, "Against")
-        )
+            (UP, "Like"),
+            (DOWN, "Dislike"))
     value = models.SmallIntegerField(choices=VALUE_CHOICES)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
@@ -128,3 +137,13 @@ class Vote(models.Model):
 
     class Meta:
         unique_together = ('user', 'movie')
+
+
+def movie_directory_path_with_uuid(instance, filename):
+    return "{}/{}".format(instance, filename)
+
+class MovieImage(models.Model):
+    image = models.ImageField(upload_to=movie_directory_path_with_uuid)
+    uploaded = models.DateTimeField(auto_now_add=True)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
