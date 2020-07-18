@@ -129,5 +129,11 @@ class MovieImageUpload(LoginRequiredMixin, CreateView):
         return redirect(to=movie_detail_url)
         
 
+class TopView(ListView):
+    template_name = "core/top_movies_list.html"
+    queryset = Movie.objects.top_movies(limit=10)
+    context_object_name = "top_movies"
+    
+
         
         
