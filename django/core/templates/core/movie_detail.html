@@ -5,8 +5,21 @@
 {% endblock %}
 
 {% block main %}
-    <h1>{{ object }}</h1>
-    <p class="lead"> {{ object.plot }} </p>
+    <div class="col">
+        <h1>{{ object }}</h1>
+        <p class="lead"> {{ object.plot }} </p>
+    </div>
+    <ul class="movie-image list-inline">
+        {% for image_object in object.movieimage_set.all %}
+            <li class="list-inline-item">
+                <img src="{{ image_object.image.url }}" alt="" style="width: 50%; height: 30%; padding-top: 10px;">
+            </li>
+        {% endfor %}
+    </ul>
+    <p>
+        <h3>Director</h3>
+        Directed By {{ object.director }}
+    </p>
 
 {% endblock %}
 
@@ -15,6 +28,16 @@
         This movie is rated:
         <span class="badge badge-primary"> {{ object.get_rating_display }} </span>
     </div>
+    {% if image_form %}
+        <div>
+            <h2>Upload Image</h2>
+            <form action="{% url 'core:movie_image_upload' movie_id=object.id %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ image_form.as_p }}
+                <button class="btn btn-primary" type="submit">Upload</button>
+            </form>
+        </div>  
+    {% endif %}
     <div>
         <h2>
             Score: {{ object.score|default_if_none:"TBD" }}
