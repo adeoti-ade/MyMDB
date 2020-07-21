@@ -104,10 +104,8 @@ class UpdateVote(LoginRequiredMixin, UpdateView):
         return redirect(to=movie_detail_url)
 
 class MovieImageUpload(LoginRequiredMixin, CreateView):
-    print("if it worked")
     form_class = MovieImageForm
-    print(form_class)
-
+    
     def get_initial(self):
         initial = super().get_initial()
         initial['user'] = self.request.user.id
